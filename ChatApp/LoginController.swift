@@ -209,6 +209,7 @@ class LoginController: UIViewController {
     var passwordTextFieldHeightAnchor: NSLayoutConstraint?
     
     func setupInputsContainerView () {
+        
         inputsContainerView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         inputsContainerView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         inputsContainerView.widthAnchor.constraint(equalTo: view.widthAnchor, constant: -24).isActive = true
