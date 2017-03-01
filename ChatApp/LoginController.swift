@@ -54,48 +54,7 @@ class LoginController: UIViewController {
         })
     }
     
-    func handleRegister() {
-        
-        guard let email = emailTextField.text,
-        let password = passwordTextField.text,
-        let name = nameTextField.text else {
-            print("Please enter email and password")
-            return
-        }
-        
-        FIRAuth.auth()?.createUser(withEmail: email, password: password, completion: {
-            ( user: FIRUser?, error) in
-                
-            if error != nil {
-                print(error!)
-                return
-            }
-            
-            
-            guard let uid = user?.uid else {
-                return
-            }
-            
-            // successfully authenticated
-            let ref = FIRDatabase.database().reference(fromURL: "https://mychat-b9a64.firebaseio.com/")
-            let userReference = ref.child("users").child(uid)
-            
-            
-            let values = ["name": name, "email": email]
-            userReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
-                
-                if err != nil {
-                    print(err!)
-                    return
-                }
-                
-                self.dismiss(animated: true, completion: nil)
-                
-                print("successfully saved user into database")
-            })
-
-        })
-    }
+    
     
     let nameTextField: UITextField = {
         let text = UITextField()
@@ -134,12 +93,20 @@ class LoginController: UIViewController {
         return text
     }()
     
-    let profileImageView: UIImageView = {
+    lazy var profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "profile")
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleSelectProfileImageView))
+        imageView.addGestureRecognizer(tap)
+        imageView.isUserInteractionEnabled = true
+        
         return imageView
     }()
+    
+    
     
     let loginRegisterSegmentedControl: UISegmentedControl = {
         let sc = UISegmentedControl(items: ["Login", "Register"])
