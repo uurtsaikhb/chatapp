@@ -22,6 +22,8 @@ class MessagesController: UITableViewController {
         checkIfUserIsLoggedIn()
     }
     
+    
+    
     func handleNewMessage() {
         let newMessageController = NewMessageController()
         let navController = UINavigationController(rootViewController: newMessageController)
@@ -29,28 +31,40 @@ class MessagesController: UITableViewController {
     }
     
     
+    
     func checkIfUserIsLoggedIn() {
         
         if FIRAuth.auth()?.currentUser?.uid == nil {
             perform(#selector(handleLogout), with: nil, afterDelay: 0)
         } else {
-            let uid = FIRAuth.auth()?.currentUser?.uid
-            let ref = FIRDatabase.database().reference()
-            
-            ref.child("users").child(uid!).observeSingleEvent(of: .value, with: { (snapshot) in
-                
-                print(snapshot)
-            
-                if let dictionary = snapshot.value as? [String: AnyObject] {
-                    self.navigationItem.title = dictionary["name"] as? String
-                }
-                
-                
-            }) { (error) in
-                print(error)
-            }
+            fetchUserAndSetupNavBarTitle()
         }
     }
+    
+    
+    
+    func fetchUserAndSetupNavBarTitle() {
+        guard let uid = FIRAuth.auth()?.currentUser?.uid else {
+            return
+        }
+        
+        let ref = FIRDatabase.database().reference()
+        
+        ref.child("users").child(uid).observeSingleEvent(of: .value, with: { (snapshot) in
+            
+            print(snapshot)
+            
+            if let dictionary = snapshot.value as? [String: AnyObject] {
+                self.navigationItem.title = dictionary["name"] as? String
+            }
+            
+            
+        }) { (error) in
+            print(error)
+        }
+    }
+    
+    
     
     func handleLogout() {
         do {
@@ -60,6 +74,7 @@ class MessagesController: UITableViewController {
         }
         
         let loginController = LoginController()
+        loginController.messageController = self
         present(loginController, animated: true, completion: nil)
     }
 

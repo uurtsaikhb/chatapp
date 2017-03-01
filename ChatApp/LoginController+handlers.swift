@@ -76,6 +76,8 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
             
             self.dismiss(animated: true, completion: nil)
             
+            self.messageController?.fetchUserAndSetupNavBarTitle()
+            
             print("successfully saved user into database")
         })
         
