@@ -40,10 +40,10 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
             
             let imageName = NSUUID().uuidString
             
-            let storageRef = FIRStorage.storage().reference().child("\(imageName).png")
+            let storageRef = FIRStorage.storage().reference().child("profile_images").child("\(imageName).jpg")
             
-            if let uploadData = UIImagePNGRepresentation(self.profileImageView.image!) {
-                
+            if let profileImage = self.profileImageView.image, let uploadData = UIImageJPEGRepresentation(profileImage, 0.1) {
+        
                 storageRef.put(uploadData, metadata: nil, completion: { (metadata, error) in
                     
                     if error != nil {
@@ -64,7 +64,7 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
     
     private func registerUserIntoDatabaseWithUID(uid: String, values: [String: AnyObject]) {
         
-        let ref = FIRDatabase.database().reference(fromURL: "https://mychat-b9a64.firebaseio.com/")
+        let ref = FIRDatabase.database().reference()
         let userReference = ref.child("users").child(uid)
         
         userReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
@@ -76,7 +76,9 @@ extension LoginController: UIImagePickerControllerDelegate, UINavigationControll
             
             self.dismiss(animated: true, completion: nil)
             
-            self.messageController?.fetchUserAndSetupNavBarTitle()
+            let user = User()
+            user.setValuesForKeys(values)
+            self.messageController?.setupNavBarWithUser(user)
             
             print("successfully saved user into database")
         })
